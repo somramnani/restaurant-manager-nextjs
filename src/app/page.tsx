@@ -1,5 +1,22 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+import Image from "next/image";
+import styles from "./page.module.css";
+import prisma from "../../lib/prisma";
+import { GetStaticProps } from "next";
+
+export const getStaticProps: GetStaticProps = async () => {
+  const feed = await prisma.post.findMany({
+    where: { published: true },
+    include: {
+      author: {
+        select: { name: true },
+      },
+    },
+  });
+  return {
+    props: { feed },
+    revalidate: 10,
+  };
+};
 
 export default function Home() {
   return (
@@ -15,7 +32,7 @@ export default function Home() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            By{' '}
+            By{" "}
             <Image
               src="/vercel.svg"
               alt="Vercel Logo"
@@ -91,5 +108,5 @@ export default function Home() {
         </a>
       </div>
     </main>
-  )
+  );
 }
